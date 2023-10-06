@@ -1,18 +1,20 @@
-import express, { NextFunction, Request, Response } from "express"
-import { json, urlencoded } from "body-parser"
+import express, { NextFunction, Request, Response, urlencoded } from "express"
+import { json } from "body-parser"
 import mongoose from "mongoose"
+import multer from "multer"
 
 import authRoutes from "./routes/auth"
 
 const app = express()
 
+app.use(urlencoded({ extended: true }))
+app.use(multer().single("image"))
 app.use(json())
-app.use(urlencoded())
 
 app.use("/auth", authRoutes)
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  res.json({ error })
+  res.json({ error, message: error.message })
 })
 
 mongoose

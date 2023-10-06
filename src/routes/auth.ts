@@ -3,6 +3,6 @@ import { signup } from "../controllers/auth"
 
 const routes = Router()
 
-routes.get("/signup", signup)
+routes.post("/signup", signup)
 
 export default routes
