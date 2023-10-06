@@ -1,10 +1,15 @@
 import express, { NextFunction, Request, Response } from "express"
-import { json } from "body-parser"
+import { json, urlencoded } from "body-parser"
 import mongoose from "mongoose"
+
+import authRoutes from "./routes/auth"
 
 const app = express()
 
 app.use(json())
+app.use(urlencoded())
+
+app.use("/auth", authRoutes)
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   res.json({ error })
