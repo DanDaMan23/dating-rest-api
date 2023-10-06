@@ -1,9 +1,28 @@
 import { RequestHandler } from "express"
+import { validationResult, Result, ValidationError } from "express-validator"
 import bcrypt from "bcrypt"
 
 import User from "../models/user"
+import CustomError from "../util/custom-error"
 
 export const signup: RequestHandler = (req, res, next) => {
+  const errors: Result<ValidationError> = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    const error = new CustomError<ValidationError>(
+      422,
+      "Validation Failed",
+      errors.array()
+    )
+
+    throw error
+  }
+
+  if (!req.file) {
+    const error = new CustomError<string>(422, "No profile picture provided")
+    throw error
+  }
+
   type bodyType = {
     email: string
     password: string

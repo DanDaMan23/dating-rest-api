@@ -5,6 +5,7 @@ import multer, { FileFilterCallback, diskStorage } from "multer"
 import { v4 as uuidv4 } from "uuid"
 
 import authRoutes from "./routes/auth"
+import CustomError from "./util/custom-error"
 
 const app = express()
 
@@ -34,9 +35,19 @@ app.use(json())
 
 app.use("/auth", authRoutes)
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  res.json({ error, message: error.message })
-})
+app.use(
+  (
+    error: CustomError<any>,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const status = error.statusCode || 500
+    const message = error.message
+    const data = error.data
+    res.status(status).json({ message, data })
+  }
+)
 
 mongoose
   .connect(
