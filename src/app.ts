@@ -1,14 +1,35 @@
 import express, { NextFunction, Request, Response, urlencoded } from "express"
 import { json } from "body-parser"
 import mongoose from "mongoose"
-import multer from "multer"
+import multer, { FileFilterCallback, diskStorage } from "multer"
+import { v4 as uuidv4 } from "uuid"
 
 import authRoutes from "./routes/auth"
 
 const app = express()
 
+const fileStorage = diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "src/images")
+  },
+  filename: (req, file, cb) => {
+    cb(null, uuidv4() + file.originalname)
+  }
+})
+
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback
+) => {
+  const isValidFileType = ["image/png", "image/jpg", "image/jpeg"].includes(
+    file.mimetype
+  )
+  cb(null, isValidFileType)
+}
+
 app.use(urlencoded({ extended: true }))
-app.use(multer().single("image"))
+app.use(multer({ storage: fileStorage, fileFilter }).single("image"))
 app.use(json())
 
 app.use("/auth", authRoutes)

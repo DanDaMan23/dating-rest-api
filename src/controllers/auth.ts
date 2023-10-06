@@ -11,10 +11,19 @@ export const signup: RequestHandler = (req, res, next) => {
     bio: string
   }
   const { email, password, name, bio } = req.body as bodyType
+
+  const { path: profilePicturePath } = req.file as { path: string }
+
   bcrypt
     .hash(password, 12)
     .then((hashedPassword: string) => {
-      const user = new User({ email, password: hashedPassword, name, bio })
+      const user = new User({
+        email,
+        password: hashedPassword,
+        name,
+        bio,
+        profilePicturePath
+      })
       return user.save()
     })
     .then((userCreated) => {
