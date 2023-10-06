@@ -7,12 +7,14 @@ export const signup: RequestHandler = (req, res, next) => {
   type bodyType = {
     email: string
     password: string
+    name: string
+    bio: string
   }
-  const { email, password } = req.body as bodyType
+  const { email, password, name, bio } = req.body as bodyType
   bcrypt
     .hash(password, 12)
     .then((hashedPassword: string) => {
-      const user = new User({ email, password: hashedPassword })
+      const user = new User({ email, password: hashedPassword, name, bio })
       return user.save()
     })
     .then((userCreated) => {
