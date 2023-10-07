@@ -1,4 +1,4 @@
-export default class CustomError<T> extends Error {
+export default class CustomError<T = string> extends Error {
   statusCode: number
   data: T[]
 

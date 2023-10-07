@@ -1,6 +1,7 @@
 import { RequestHandler } from "express"
 import { validationResult, Result, ValidationError } from "express-validator"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 import User from "../models/user"
 import CustomError from "../util/custom-error"
@@ -25,7 +26,7 @@ export const signup: RequestHandler = (req, res, next) => {
   }
 
   if (!req.file) {
-    const error = new CustomError<string>(422, "No profile picture provided")
+    const error = new CustomError(422, "No profile picture provided")
     throw error
   }
 
@@ -53,6 +54,47 @@ export const signup: RequestHandler = (req, res, next) => {
     })
     .then((userCreated) => {
       res.status(201).json({ message: "New User Created", userCreated })
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    })
+}
+
+export const login: RequestHandler = (req, res, next) => {
+  type bodyType = {
+    email: string
+    password: string
+  }
+
+  const { email, password } = req.body as bodyType
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        const error = new CustomError(
+          401,
+          "A user with this email could not be found."
+        )
+        throw error
+      }
+
+      return bcrypt.compare(password, user.password).then((isEqual) => {
+        if (!isEqual) {
+          const error = new CustomError(401, "Wrong Password")
+          throw error
+        }
+
+        const token = jwt.sign(
+          { email: user.email, password: user.password },
+          "secret",
+          { expiresIn: "1h" }
+        )
+
+        res.status(200).json({ token, userId: user._id.toString() })
+      })
     })
     .catch((err) => {
       if (!err.statusCode) {

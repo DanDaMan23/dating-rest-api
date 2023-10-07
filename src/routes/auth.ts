@@ -1,11 +1,11 @@
 import { Router } from "express"
-import { signup } from "../controllers/auth"
+import { login, signup } from "../controllers/auth"
 import { check } from "express-validator"
 import User from "../models/user"
 
-const routes = Router()
+const router = Router()
 
-routes.post(
+router.post(
   "/signup",
   [
     check("email", "Please enter a valid email")
@@ -30,4 +30,6 @@ routes.post(
   signup
 )
 
-export default routes
+router.post("/login", login)
+
+export default router
