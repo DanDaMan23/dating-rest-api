@@ -38,12 +38,7 @@ app.use(json())
 app.use("/auth", authRoutes)
 
 app.use(
-  (
-    error: CustomError<any>,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  (error: CustomError, req: Request, res: Response, next: NextFunction) => {
     const status = error.statusCode || 500
     const message = error.message
     const data = error.data
