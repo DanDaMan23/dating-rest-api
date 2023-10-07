@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 
 import authRoutes from "./routes/auth"
 import CustomError from "./util/custom-error"
+import path from "path"
 
 const app = express()
 
@@ -31,6 +32,7 @@ const fileFilter = (
 
 app.use(urlencoded({ extended: true }))
 app.use(multer({ storage: fileStorage, fileFilter }).single("image"))
+app.use("/images", express.static(path.join(__dirname, "images")))
 app.use(json())
 
 app.use("/auth", authRoutes)

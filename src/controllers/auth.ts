@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 
 import User from "../models/user"
 import CustomError from "../util/custom-error"
+import { clearImage } from "../util/clear-image"
 
 export const signup: RequestHandler = (req, res, next) => {
   const errors: Result<ValidationError> = validationResult(req)
@@ -14,6 +15,11 @@ export const signup: RequestHandler = (req, res, next) => {
       "Validation Failed",
       errors.array()
     )
+
+    if (req.file) {
+      const { path: profilePicturePath } = req.file as { path: string }
+      clearImage(profilePicturePath)
+    }
 
     throw error
   }
