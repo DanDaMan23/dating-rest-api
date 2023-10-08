@@ -159,3 +159,46 @@ export const generateResetPasswordToken: RequestHandler = (req, res, next) => {
       })
   })
 }
+
+export const updatePassword: RequestHandler = (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const error = new CustomError(422, "Validation failed")
+    throw error
+  }
+
+  type bodyType = {
+    newPassword: string
+    resetPasswordToken: string
+  }
+
+  const { newPassword, resetPasswordToken } = req.body as bodyType
+
+  User.findOne({
+    passwordResetToken: resetPasswordToken,
+    passwordResetTokenExpiry: { $gt: new Date() }
+  })
+    .then((user) => {
+      if (!user) {
+        const error = new CustomError(401, "User not found with this token")
+        throw error
+      }
+      return bcrypt
+        .hash(newPassword, 12)
+        .then((hashedPassword) => {
+          user.password = hashedPassword
+          user.passwordResetToken = undefined
+          user.passwordResetTokenExpiry = undefined
+          return user.save()
+        })
+        .then(() => {
+          return res.status(200).json({ message: "Password Updated" })
+        })
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    })
+}
