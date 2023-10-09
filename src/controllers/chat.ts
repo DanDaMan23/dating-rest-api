@@ -1,13 +1,23 @@
 import { RequestHandler } from "express"
+import { Result, ValidationError, validationResult } from "express-validator"
 
 import Chat from "../models/chat"
 import User from "../models/user"
 import Message from "../models/message"
 import user from "../models/user"
+import CustomError from "../util/custom-error"
 
 export const newChat: RequestHandler = (req, res, next) => {
-  console.log("newChat")
-  console.log(req.userId)
+  const errors: Result<ValidationError> = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    const error = new CustomError<ValidationError>(
+      422,
+      "Validation Failed",
+      errors.array()
+    )
+    throw error
+  }
 
   type bodyType = {
     toUserId: string
