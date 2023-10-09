@@ -5,8 +5,17 @@ import multer, { FileFilterCallback, diskStorage } from "multer"
 import { v4 as uuidv4 } from "uuid"
 
 import authRoutes from "./routes/auth"
+import chatRoutes from "./routes/chat"
 import CustomError from "./util/custom-error"
 import path from "path"
+
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string
+    }
+  }
+}
 
 const app = express()
 
@@ -36,6 +45,7 @@ app.use("/images", express.static(path.join(__dirname, "images")))
 app.use(json())
 
 app.use("/auth", authRoutes)
+app.use("/chat", chatRoutes)
 
 app.use((error: CustomError, req: Request, res: Response) => {
   const status = error.statusCode || 500
