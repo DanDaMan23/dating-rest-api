@@ -1,5 +1,10 @@
 import { Router } from "express"
-import { login, signup } from "../controllers/auth"
+import {
+  generateResetPasswordToken,
+  login,
+  signup,
+  updatePassword
+} from "../controllers/auth"
 import { check } from "express-validator"
 import User from "../models/user"
 
@@ -31,5 +36,20 @@ router.post(
 )
 
 router.post("/login", login)
+
+router.post(
+  "/generateResetPasswordToken",
+  [check("email", "Email required").isEmail()],
+  generateResetPasswordToken
+)
+
+router.put(
+  "/updatePassword",
+  [
+    check("newPassword", "New Password Required").isLength({ min: 5 }),
+    check("resetPasswordToken")
+  ],
+  updatePassword
+)
 
 export default router

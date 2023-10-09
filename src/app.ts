@@ -37,14 +37,12 @@ app.use(json())
 
 app.use("/auth", authRoutes)
 
-app.use(
-  (error: CustomError, req: Request, res: Response, next: NextFunction) => {
-    const status = error.statusCode || 500
-    const message = error.message
-    const data = error.data
-    res.status(status).json({ message, data })
-  }
-)
+app.use((error: CustomError, req: Request, res: Response) => {
+  const status = error.statusCode || 500
+  const message = error.message
+  const data = error.data
+  res.status(status).json({ message, data })
+})
 
 mongoose
   .connect(
