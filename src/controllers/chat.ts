@@ -125,7 +125,7 @@ export const chat: RequestHandler = async (req, res, next) => {
 
       Message.find({ _id: { $in: chat.messages } }).then(
         (messages: IMessage[] | null) => {
-          res.status(201).json({ message: "Chats", messages })
+          res.status(201).json({ messages })
         }
       )
     })
