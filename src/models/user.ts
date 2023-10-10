@@ -1,5 +1,16 @@
 import { Schema, model } from "mongoose"
 
+export interface IUser extends Document {
+  email: string
+  password: string
+  name: string
+  bio: string
+  profilePicturePath: string
+  passwordResetToken: string
+  passwordResetTokenExpiry: Date
+  chats: Schema.Types.ObjectId[]
+}
+
 const userSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -11,4 +22,4 @@ const userSchema = new Schema({
   chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }]
 })
 
-export default model("User", userSchema)
+export default model<IUser>("User", userSchema)

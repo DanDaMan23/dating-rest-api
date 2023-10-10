@@ -1,4 +1,10 @@
-import { Schema, model } from "mongoose"
+import { Document, Schema, model } from "mongoose"
+
+export interface IMessage extends Document {
+  message: string
+  creator: Schema.Types.ObjectId[]
+  date: Date
+}
 
 const messageSchema = new Schema({
   message: { type: String, required: true },
@@ -6,4 +12,4 @@ const messageSchema = new Schema({
   date: { type: Date, required: true }
 })
 
-export default model("Message", messageSchema)
+export default model<IMessage>("Message", messageSchema)
