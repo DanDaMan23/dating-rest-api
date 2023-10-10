@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { check } from "express-validator"
-import { newChat, reply } from "../controllers/chat"
+import { chat, newChat, reply } from "../controllers/chat"
 import { isAuth } from "../middleware/is-auth"
 
 const router = Router()
@@ -25,6 +25,8 @@ router.put(
   reply
 )
 
-router.get("chat/:chatId")
+router.get("/:chatId", isAuth, chat)
+
+// router.get("/chats")
 
 export default router

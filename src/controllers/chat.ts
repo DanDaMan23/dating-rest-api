@@ -1,9 +1,9 @@
 import { RequestHandler } from "express"
 import { Result, ValidationError, validationResult } from "express-validator"
 
-import Chat from "../models/chat"
+import Chat, { IChat } from "../models/chat"
 import User from "../models/user"
-import Message from "../models/message"
+import Message, { IMessage } from "../models/message"
 import CustomError from "../util/custom-error"
 
 export const newChat: RequestHandler = (req, res, next) => {
@@ -99,12 +99,40 @@ export const reply: RequestHandler = (req, res, next) => {
         creator: req.userId,
         date: new Date()
       })
-      return newMessage.save().then((result) => {
+
+      return newMessage.save().then((result: IMessage) => {
         chat.messages.push(result._id)
         return chat.save()
       })
     })
     .then((result) => {
       res.status(201).json({ message: "message sent", result })
+    })
+}
+
+export const chat: RequestHandler = async (req, res, next) => {
+  type paramsType = {
+    chatId: string
+  }
+
+  const { chatId } = req.params as paramsType
+
+  Chat.findOne({ _id: chatId })
+    .then((chat: IChat | null) => {
+      if (!chat) {
+        throw new Error("No chat found with this chatId")
+      }
+
+      Message.find({ _id: { $in: chat.messages } }).then(
+        (messages: IMessage[] | null) => {
+          res.status(201).json({ message: "Chats", messages })
+        }
+      )
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
     })
 }
