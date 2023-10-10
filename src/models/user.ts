@@ -7,7 +7,8 @@ const userSchema = new Schema({
   bio: { type: String, required: true },
   profilePicturePath: { type: String, required: true },
   passwordResetToken: { type: String, required: false },
-  passwordResetTokenExpiry: { type: Date, required: false }
+  passwordResetTokenExpiry: { type: Date, required: false },
+  chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }]
 })
 
 export default model("User", userSchema)

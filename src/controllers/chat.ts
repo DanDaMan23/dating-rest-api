@@ -41,7 +41,31 @@ export const newChat: RequestHandler = (req, res, next) => {
       })
       return newChat.save()
     })
+    .then((chat) => {
+      User.findById(req.userId).then((user) => {
+        if (!user) {
+          throw new CustomError(401, "User not found with this Id")
+        }
+        user.chats.push(chat._id)
+        user.save()
+      })
+
+      User.findById(toUserId).then((user) => {
+        if (!user) {
+          throw new CustomError(401, "User not found with this Id")
+        }
+        user.chats.push(chat._id)
+        user.save()
+      })
+      return chat
+    })
     .then((result) => {
       res.status(201).json({ result })
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
     })
 }
