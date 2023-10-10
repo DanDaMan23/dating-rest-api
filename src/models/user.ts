@@ -6,8 +6,8 @@ export interface IUser extends Document {
   name: string
   bio: string
   profilePicturePath: string
-  passwordResetToken: string
-  passwordResetTokenExpiry: Date
+  passwordResetToken: string | undefined
+  passwordResetTokenExpiry: Date | undefined
   chats: Schema.Types.ObjectId[]
 }
 
