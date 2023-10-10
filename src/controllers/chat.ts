@@ -4,7 +4,6 @@ import { Result, ValidationError, validationResult } from "express-validator"
 import Chat from "../models/chat"
 import User from "../models/user"
 import Message from "../models/message"
-import user from "../models/user"
 import CustomError from "../util/custom-error"
 
 export const newChat: RequestHandler = (req, res, next) => {
