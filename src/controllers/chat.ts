@@ -111,7 +111,24 @@ export const reply: RequestHandler = (req, res, next) => {
     })
 }
 
-export const chats: RequestHandler = (req, res, next) => {}
+export const chats: RequestHandler = (req, res, next) => {
+  User.findById(req.userId).then((user: IUser | null) => {
+    if (!user) {
+      throw new Error("No user found with this id")
+    }
+
+    Chat.find({ _id: { $in: user.chats } })
+      .then((chats: IChat[] | null) => {
+        res.status(201).json({ chats })
+      })
+      .catch((err) => {
+        if (!err.statusCode) {
+          err.statusCode = 500
+        }
+        next(err)
+      })
+  })
+}
 
 export const chat: RequestHandler = (req, res, next) => {
   type paramsType = {
