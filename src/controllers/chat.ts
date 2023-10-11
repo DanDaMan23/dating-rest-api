@@ -2,9 +2,10 @@ import { RequestHandler } from "express"
 import { Result, ValidationError, validationResult } from "express-validator"
 
 import Chat, { IChat } from "../models/chat"
-import User from "../models/user"
+import User, { IUser } from "../models/user"
 import Message, { IMessage } from "../models/message"
 import CustomError from "../util/custom-error"
+import { Schema } from "mongoose"
 
 export const newChat: RequestHandler = (req, res, next) => {
   const errors: Result<ValidationError> = validationResult(req)
@@ -110,12 +111,35 @@ export const reply: RequestHandler = (req, res, next) => {
     })
 }
 
-export const chat: RequestHandler = async (req, res, next) => {
+export const chats: RequestHandler = (req, res, next) => {}
+
+export const chat: RequestHandler = (req, res, next) => {
   type paramsType = {
     chatId: string
   }
 
   const { chatId } = req.params as paramsType
+
+  User.findById(req.userId)
+    .then((user: IUser | null) => {
+      if (!user) {
+        throw new Error("No user found with this id")
+      }
+
+      if (
+        !user.chats
+          .map((chat: Schema.Types.ObjectId) => chat.toString())
+          .includes(chatId)
+      ) {
+        throw new CustomError(422, "This chat cannot be access by this user")
+      }
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    })
 
   Chat.findOne({ _id: chatId })
     .then((chat: IChat | null) => {
