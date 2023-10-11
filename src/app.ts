@@ -47,12 +47,7 @@ app.use(json())
 app.use("/auth", authRoutes)
 app.use("/chat", chatRoutes)
 
-app.use((error: CustomError, req: Request, res: Response) => {
-  const status = error.statusCode || 500
-  const message = error.message
-  const data = error.data
-  res.status(status).json({ message, data })
-})
+app.use(CustomError.errorHandler)
 
 mongoose
   .connect(
