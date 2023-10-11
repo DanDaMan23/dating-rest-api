@@ -118,6 +118,7 @@ export const chats: RequestHandler = (req, res, next) => {
     }
 
     Chat.find({ _id: { $in: user.chats } })
+      .populate({ path: "users", select: "name" })
       .then((chats: IChat[] | null) => {
         res.status(201).json({ chats })
       })
