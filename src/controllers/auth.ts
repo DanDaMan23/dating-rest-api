@@ -89,7 +89,7 @@ export const login: RequestHandler = (req, res, next) => {
         }
 
         const token = jwt.sign(
-          { email: user.email, password: user.password },
+          { email: user.email, password: user.password, userId: user._id },
           "secret",
           { expiresIn: "1h" }
         )
