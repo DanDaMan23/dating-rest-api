@@ -1,12 +1,27 @@
+import { NextFunction, Request, Response } from "express"
+
 export default class CustomError<T = string> extends Error {
-  statusCode: number
   data: T[]
 
-  constructor(statusCode: number, message: string, data: T[] = []) {
+  constructor(public statusCode: number, message: string, data: T[] = []) {
     super(message)
-    this.statusCode = statusCode
     this.data = data
+  }
 
-    Object.setPrototypeOf(this, CustomError.prototype)
+  static errorHandler(
+    err: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    if (res.headersSent) {
+      return next(err)
+    }
+
+    if (err instanceof CustomError) {
+      return res.status(err.statusCode).json({ error: err.message })
+    }
+
+    return res.status(500).json({ error: "Internal Server Error" })
   }
 }
