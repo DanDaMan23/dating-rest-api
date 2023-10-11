@@ -9,17 +9,19 @@ export default class CustomError<T = string> extends Error {
   }
 
   static errorHandler(
-    err: Error,
+    error: Error,
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     if (res.headersSent) {
-      return next(err)
+      return next(error)
     }
 
-    if (err instanceof CustomError) {
-      return res.status(err.statusCode).json({ error: err.message })
+    if (error instanceof CustomError) {
+      return res
+        .status(error.statusCode)
+        .json({ ...error, message: error.message })
     }
 
     return res.status(500).json({ error: "Internal Server Error" })
