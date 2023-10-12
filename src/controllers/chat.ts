@@ -160,16 +160,13 @@ export const chat: RequestHandler = (req, res, next) => {
     })
 
   Chat.findOne({ _id: chatId })
+    .populate({ path: "messages" })
     .then((chat: IChat | null) => {
       if (!chat) {
         throw new Error("No chat found with this chatId")
       }
 
-      Message.find({ _id: { $in: chat.messages } }).then(
-        (messages: IMessage[] | null) => {
-          res.status(201).json({ messages })
-        }
-      )
+      res.status(201).json({ chat })
     })
     .catch((err) => {
       if (!err.statusCode) {
