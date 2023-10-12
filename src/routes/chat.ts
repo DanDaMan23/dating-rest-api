@@ -1,6 +1,12 @@
 import { Router } from "express"
 import { check } from "express-validator"
-import { chat, chats, newChat, reply } from "../controllers/chat"
+import {
+  chat,
+  chats,
+  newChat,
+  reply,
+  updateChatName
+} from "../controllers/chat"
 import { isAuth } from "../middleware/is-auth"
 
 const router = Router()
@@ -28,5 +34,15 @@ router.put(
 router.get("/:chatId", isAuth, chat)
 
 router.get("/", isAuth, chats)
+
+router.put(
+  "/updateChatName",
+  [
+    check("chatId", "Chat Id is Required").notEmpty(),
+    check("chatName", "Chatname is required").isLength({ min: 1 })
+  ],
+  isAuth,
+  updateChatName
+)
 
 export default router

@@ -160,17 +160,74 @@ export const chat: RequestHandler = (req, res, next) => {
     })
 
   Chat.findOne({ _id: chatId })
+    .populate({ path: "messages" })
     .then((chat: IChat | null) => {
       if (!chat) {
         throw new Error("No chat found with this chatId")
       }
 
-      Message.find({ _id: { $in: chat.messages } }).then(
-        (messages: IMessage[] | null) => {
-          res.status(201).json({ messages })
-        }
-      )
+      res.status(201).json({ chat })
     })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    })
+}
+
+export const updateChatName: RequestHandler = (req, res, next) => {
+  const errors: Result<ValidationError> = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    const error = new CustomError<ValidationError>(
+      422,
+      "Validation Failed",
+      errors.array()
+    )
+    throw error
+  }
+
+  type bodyType = {
+    chatId: string
+    chatName: string
+  }
+
+  const { chatId, chatName } = req.body as bodyType
+
+  User.findById(req.userId)
+    .then((user: IUser | null) => {
+      if (!user) {
+        throw new Error("No user found with this id")
+      }
+
+      if (
+        !user.chats
+          .map((chat: Schema.Types.ObjectId) => chat.toString())
+          .includes(chatId)
+      ) {
+        throw new CustomError(422, "This chat cannot be access by this user")
+      }
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    })
+
+  Chat.findById(chatId)
+    .then((chat: IChat | null) => {
+      if (!chat) {
+        throw new Error("No chat found with this id")
+      }
+
+      chat.chatName = chatName
+      chat.save()
+    })
+    .then((result) =>
+      res.status(200).json({ message: "Chat name updated", result })
+    )
     .catch((err) => {
       if (!err.statusCode) {
         err.statusCode = 500
