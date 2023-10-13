@@ -3,6 +3,7 @@ import { validationResult, Result, ValidationError } from "express-validator"
 
 import User, { IUser } from "../models/user"
 import CustomError from "../util/custom-error"
+import { clearImage } from "../util/clear-image"
 
 export const updateProfile: RequestHandler = (req, res, next) => {
   const errors: Result<ValidationError> = validationResult(req)
@@ -28,6 +29,11 @@ export const updateProfile: RequestHandler = (req, res, next) => {
     .then((user: IUser | null) => {
       if (!user) {
         throw new Error("No user found with this id")
+      }
+
+      if (req.file) {
+        clearImage(user.profilePicturePath)
+        user.profilePicturePath = req.file.path
       }
 
       user.name = name
