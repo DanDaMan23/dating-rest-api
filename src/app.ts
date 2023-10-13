@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 
 import authRoutes from "./routes/auth"
 import chatRoutes from "./routes/chat"
+import userRoutes from "./routes/user"
 import CustomError from "./util/custom-error"
 import path from "path"
 
@@ -46,6 +47,7 @@ app.use(json())
 
 app.use("/auth", authRoutes)
 app.use("/chat", chatRoutes)
+app.use("/user", userRoutes)
 
 app.use(CustomError.errorHandler)
 
