@@ -63,7 +63,7 @@ export const deleteProfile: RequestHandler = (req, res, next) => {
       clearImage(user.profilePicturePath)
       return User.deleteOne({ _id: user._id })
     })
-    .then((result) => {
+    .then(() => {
       res.status(200).json({ message: "User Deleted" })
     })
     .catch((err) => {
