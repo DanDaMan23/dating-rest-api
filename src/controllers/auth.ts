@@ -18,18 +18,18 @@ export const signup: RequestHandler = (req, res, next) => {
       errors.array()
     )
 
-    if (req.file) {
-      const { path: profilePicturePath } = req.file as { path: string }
-      clearImage(profilePicturePath)
-    }
+    // if (req.file) {
+    //   const { path: profilePicturePath } = req.file as { path: string }
+    //   clearImage(profilePicturePath)
+    // }
 
     throw error
   }
 
-  if (!req.file) {
-    const error = new CustomError(422, "No profile picture provided")
-    throw error
-  }
+  // if (!req.file) {
+  //   const error = new CustomError(422, "No profile picture provided")
+  //   throw error
+  // }
 
   type bodyType = {
     email: string
@@ -39,7 +39,7 @@ export const signup: RequestHandler = (req, res, next) => {
   }
   const { email, password, name, bio } = req.body as bodyType
 
-  const { path: profilePicturePath } = req.file as { path: string }
+  // const { path: profilePicturePath } = req.file as { path: string }
 
   bcrypt
     .hash(password, 12)
@@ -48,8 +48,8 @@ export const signup: RequestHandler = (req, res, next) => {
         email,
         password: hashedPassword,
         name,
-        bio,
-        profilePicturePath
+        bio
+        // profilePicturePath
       })
       return user.save()
     })
