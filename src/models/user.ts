@@ -16,7 +16,7 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   bio: { type: String, required: true },
-  profilePicturePath: { type: String, required: true },
+  profilePicturePath: { type: String, required: false },
   passwordResetToken: { type: String, required: false },
   passwordResetTokenExpiry: { type: Date, required: false },
   chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }]
